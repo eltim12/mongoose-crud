@@ -21,8 +21,41 @@ module.exports = {
     },
 
     async findAll(req, res) {
+        let search = {}
+
+        if (req.query.q) {
+            search = {
+                $or: [{
+                    title: {
+                        $regex: '.*' + req.query.q + '.*',
+                        $options: "i"
+                    }
+                }, {
+                    author: {
+                        $regex: '.*' + req.query.q + '.*',
+                        $options: "i"
+                    }
+                }]
+            }
+        } else if (req.query.title) {
+            search = {
+                title: {
+                    $regex: '.*' + req.query.title + '.*',
+                    $options: "i"
+                }
+            }
+        } else if (req.query.author) {
+            search = {
+                author: {
+                    $regex: '.*' + req.query.author + '.*',
+                    $options: "i"
+                }
+            }
+        }
+
+
         try {
-            let allBooks = await Book.find()
+            let allBooks = await Book.find(search)
             res.status(200).json(allBooks)
         } catch (err) {
             res.status(500).json({

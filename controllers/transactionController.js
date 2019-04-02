@@ -20,10 +20,20 @@ module.exports = {
     },
 
     async findAll(req, res) {
-
         try {
             let allData = await Transaction.find({}).populate("booklist")
-            res.status(200).json(allData)
+
+            if (!req.query.id) {
+                res.status(200).json(allData)
+            } else {
+                let found = []
+                allData.map(e => {
+                    e.booklist.map(b => {
+                        found.push(e)
+                    })
+                })
+                res.status(200).json(found)
+            }
         } catch (err) {
             res.status(500).json({
                 msg: 'internal server error.'
